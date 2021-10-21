@@ -1,5 +1,6 @@
 from .FileParser import FileParser
 from ..utils.obUtils import obmol_to_mol_dict, ob_read_file_to_mol_dict
+from ..Base.Molecule import Molecule
 import openbabel as ob
 import subprocess
 import os
@@ -23,9 +24,9 @@ class MopacIn:
         """Reads scalar data from file to a dictionary"""
         raise NotImplementedError("read_scalar_data is not implemented feature for MOPAC input files")
 
-    def _read_mol_dict(self):
+    def read_specie(self):
         """Method to read specie list (atom_symbols key), cartesian coordinates (atom_coords key) and bond information (bondmap key) to a dictionary"""
-        raise NotImplementedError("_read_mol_dict is not implemented feature for MOPAC input files")
+        raise NotImplementedError("read_specie is not implemented feature for MOPAC input files")
 
     def _check_kwdict(self, kwdict: dict):
         if not "top_kwds" in kwdict.keys():
@@ -33,7 +34,7 @@ class MopacIn:
         if not "bottom_kwds" in kwdict.keys():
             raise ValueError("Keywords dictionary must contain bottom_kwds entry for bottom keywords, value is a list of strings")
 
-    def _write_file(self, moldict: dict, kwdict: dict):
+    def write_file(self, molecule: Molecule, kwdict: dict):
         """internal write method. takes molecule dict (atom_symbols, atom_coords, bondmap) and kwdict (top_kwds, bottom_kwds)"""
         self._check_kwdict(kwdict)
         with open(self.path, "w") as f:
@@ -48,9 +49,9 @@ class MopacIn:
                 f.write("\n")
 
             # writing coords and atoms
-            for atom, coord in zip(moldict["atom_symbols"], moldict["atom_coords"]):
-                s = atom
-                for c in coord:
+            for atom in molecule.atoms:
+                s = atom.symbol
+                for c in atom.coordinates:
                     s += " " + str(round(c, 4)) + " 1"
                 s += "\n"
                 f.write(s)
@@ -62,15 +63,3 @@ class MopacIn:
                     bottom_string += " " + word
                 f.write("\n")
                 f.write(bottom_string)
-            # f.write("\n") # must be two blank lines at the end
-
-    def write_file(self, obmol: ob.OBMol, kwdict: dict):
-        moldict = obmol_to_mol_dict(obmol)
-        self._write_file(moldict, kwdict)
-    
-    def write_file(self, molfile: str, kwdict: dict):
-        if not os.path.isfile(molfile):
-            raise ValueError("Supplied molecule file does not exist")
-        
-        moldict = ob_read_file_to_mol_dict(molfile)
-        self._write_file(moldict, kwdict)

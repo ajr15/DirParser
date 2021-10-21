@@ -1,4 +1,5 @@
 from abc import ABC, abstractclassmethod
+from ..Base.Specie import Specie
 import os
 
 class FileParser (ABC):
@@ -22,24 +23,17 @@ class FileParser (ABC):
         pass
 
     @abstractclassmethod
-    def _read_mol_dict(self):
-        """Method to read specie list (atom_symbols key), cartesian coordinates (atom_coords key) and bond information (bondmap key) to a dictionary"""
+    def read_specie(self):
+        """Method to read Specie (Molecule or Structure) from the file"""
         pass
 
-    def _read_lattice_vectors(self):
-        """Method to read lattice vectors (for solid state calculations)"""
-        raise NotImplementedError("The method _read_lattice_vectors needs to be implemented for solid-state parsing")
+    @abstractclassmethod
+    def write_file(self, specie: Specie, kwdict: dict):
+        """Method to write the file type, given keywords dictionary and a specie."""
+        raise NotImplementedError("Write file method is not implemented for this structure")
 
     def save_specie(self, specie_path):
         """Method to save a specie data to standard format (xyz, cif...)"""
         # reading molecule
-        moldict = self._read_mol_dict()
-        if specie_path.endswith('.xyz'):
-            with open(specie_path, "w") as f:
-                f.write(str(len(moldict["atom_symbols"])) + "\r")
-                f.write("ORCA OUT FILE\r")
-                for s, coords in zip(moldict["atom_symbols"], moldict["atom_coords"]):
-                    string = " ".join([s] + [str(x) for x in coords]) + "\r"
-                    f.write(string)
-        else:
-            raise NotImplementedError("Currently there is support only for XYZ files")
+        specie = self.read_specie()
+        specie.save_to_file(specie_path)

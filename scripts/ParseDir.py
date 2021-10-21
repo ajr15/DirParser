@@ -1,7 +1,7 @@
 import argparse
 import os
 from importlib import import_module
-import sys; sys.path.append("C:\\Users\\Shachar\\OneDrive - Technion\\Technion\\PhD\\Other Projects")
+import sys; sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from DirParser.src.DirParser import DirParser
 
 def get_type_from_str(type_str):

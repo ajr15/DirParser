@@ -1,4 +1,7 @@
 from .FileParser import FileParser
+from ..Base.Atom import Atom
+from ..Base.Molecule import Molecule
+from ..Base.Specie import Specie
 import re
 import numpy as np
 
@@ -80,7 +83,7 @@ class MopacOut (FileParser):
         return outdict
 
 
-    def _read_mol_dict(self):
+    def read_specie(self):
         """Method to read specie list (atom_symbols key), cartesian coordinates (atom_coords key) and bond information (bondmap key) to a dictionary"""
         outdict = {
                     "atom_symbols": None,
@@ -110,8 +113,9 @@ class MopacOut (FileParser):
                     outdict["atom_symbols"].append(wordsvec[1])
                     outdict["atom_coords"].append([float(x) for x in wordsvec[2:]])
                     continue
-
-        return outdict
+        # creating Molecule object
+        atoms = [Atom(s, np.array(c)) for s, c in zip(outdict["atom_symbols"], outdict["atom_coords"])]
+        return Molecule(atoms)
 
     def read_frequency_dict(self):
         """Method to read frequency data from mopac output file.
@@ -158,5 +162,8 @@ class MopacOut (FileParser):
                         outdict["force_constants"].append(float(wordsvec[2]))
                 
             return outdict
+
+    def write_file(self, specie: Specie, kwdict: dict):
+        return super().write_file()
 
 

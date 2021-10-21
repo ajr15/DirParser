@@ -33,7 +33,7 @@ class OrcaOut (FileParser):
                     outdict["finished_normally"] = True
         return outdict
 
-    def _read_mol_dict(self):
+    def read_mol_dict(self):
         outdict = {
             "atom_symbols": None,
             "atom_coords": None,

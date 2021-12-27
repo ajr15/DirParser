@@ -1,12 +1,13 @@
 from abc import ABC, abstractclassmethod
 from .Atom import Atom
-from typing import List
+from typing import List, Optional
 from copy import copy
 
 
 class Specie (ABC):
     
-    def __init__(self, atoms: List[Atom]=[]):
+    def __init__(self, atoms: Optional[List[Atom]]=None):
+        self.properties = {}
         self.atoms = [copy(atom) for atom in atoms] # copying list to prevent overriding problems
         for atom in self.atoms:
             atom.parent_specie = self

@@ -4,6 +4,7 @@ from ..utils.utils import generate_unique_id
 from pymatgen.core.periodic_table import Element
 import warnings
 from typing import List
+import os
 
 class AbinitIn (FileParser):
     extension = "abi"
@@ -23,9 +24,14 @@ class AbinitIn (FileParser):
         nkwdict = {}
         if not "pp_dirpath" in kwdict:
             raise ValueError("Must put pp_dirpath (path to directory with pseudo ")
+        if not "autoparal" in kwdict:
+            warnings.warn("No parallelization option found, adding one automatically. if you dont want parallelization, set \'autoparal\'=0 in kwdict")
+            nkwdict["autoparal"] = 1
         for k, v in kwdict.items():
             if k in ["acell", "rprim", "ntypat", "znucl", "natom", "typat", "xred"]:
                 warnings.warn("{} is specified in keywords dictionary but is determined automatically. It will be overwritten.".format(k))
+            elif k == "temp_dir":
+                nkwdict["tmpdata_prefix"] = os.path.join(v, str(generate_unique_id()))
             else:
                 nkwdict[k] = v if not type(v) is str else "\"" + v + "\""
         return nkwdict

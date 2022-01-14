@@ -16,6 +16,8 @@ class Molecule (Specie):
             self.bonds = []
         else:
             self.bonds = bonds
+        if atoms is None:
+            atoms = []
         for bond in self.bonds:
             bond.parent_specie = self
         super().__init__(atoms)

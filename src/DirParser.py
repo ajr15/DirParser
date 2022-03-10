@@ -12,9 +12,10 @@ class DirParser:
         if not os.path.isdir(path):
             raise ValueError("{} is not a directory. Must provide a dicrectory".format(path))
         outs = []
-        for fname in os.listdir(path):
-            if fname.endswith(self.file_parser.extension):
-                outs.append(f(self.file_parser, path, fname, *args, **kwargs))
+        for dir, subdir, fnames in os.walk(path):
+            for fname in fnames:
+                if fname.endswith(self.file_parser.extension):
+                    outs.append(f(self.file_parser, os.path.join(dir, subdir), fname, *args, **kwargs))
         return outs
 
     def read_data(self, path, *args, **kwargs):
@@ -22,12 +23,13 @@ class DirParser:
         if not os.path.isdir(path):
             raise ValueError("{} is not a directory. Must provide a dicrectory".format(path))
         self.df = pd.DataFrame()
-        for fname in os.listdir(path):
-            if fname.endswith(self.file_parser.extension):
-                f = self.file_parser(os.path.join(path, fname))
-                d = f.read_scalar_data(*args, **kwargs)
-                d.update({"name": os.path.splitext(fname)[0]})
-                self.df = self.df.append(d, ignore_index=True)
+        for dir, subdirs, fnames in os.walk(path):
+            for fname in fnames:
+                if fname.endswith(self.file_parser.extension):
+                    f = self.file_parser(os.path.join(dir, fname))
+                    d = f.read_scalar_data(*args, **kwargs)
+                    d.update({"dir": dir, "name": os.path.splitext(fname)[0]})
+                    self.df = self.df.append(d, ignore_index=True)
         return self.df
 
     def save_species(self, path, ext, *args, **kwargs):
@@ -38,10 +40,11 @@ class DirParser:
         mol_dir = os.path.join(path, 'molecule_files')
         if not os.path.isdir(mol_dir):
             os.mkdir(mol_dir)
-        for fname in os.listdir(path):
-            if fname.endswith(self.file_parser.extension):
-                f = self.file_parser(os.path.join(path, fname))
-                mol = f.save_specie(os.path.join(mol_dir, os.path.splitext(fname)[0] + "." + ext), *args, **kwargs)
+        for dir, subdir, fnames in os.walk(path):
+            for fname in fnames:
+                if fname.endswith(self.file_parser.extension):
+                    f = self.file_parser(os.path.join(dir, fname))
+                    mol = f.save_specie(os.path.join(mol_dir, os.path.splitext(fname)[0] + "." + ext), *args, **kwargs)
 
     def to_csv(self, path):
         """Write data to csv file"""

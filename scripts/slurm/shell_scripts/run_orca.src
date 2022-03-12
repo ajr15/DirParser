@@ -1,0 +1,48 @@
+#!/bin/bash
+# parsing command line arguments
+# COMMAND LINE ARGUMENTS
+# 1. (required, str) input_path: full path to input file for run
+#	2. (required, str) orca_parent: full path to the ORCA directory
+#	3. (required, int) use_hwthreading: 0 or 1 designating use of hyperthreading in the machine
+input_path=$1
+orca_path=$2
+use_hw=$3
+output=$4
+
+echo "***** RUNNING ORCA ON SLURM *****"
+echo "Run parameters"
+echo "	input path = $input_path"
+echo "	parent orca directory = $orca_path"
+echo "	use hwthreading = $use_hw"
+echo ""
+echo "***** SETTING UP ENVIRONMENT *****"
+
+# making input and output directories
+input_name=`basename "$input_path"`
+input_dir=`dirname "$input_path"`
+output_dir=`dirname "$input_path"`
+output_dir=`dirname "$output_dir"`
+name=${input_name:0:-4}
+output_dir="$(echo $output_dir)/$(echo $name)_out"
+mkdir "$output_dir"
+cp "$input_path" "$output_dir"
+
+# adding ORCA parent to LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$orca_path
+
+echo ""
+echo "Environment parameters:"
+echo "	output directory = $output_dir"
+
+echo "***** RUNNING ORCA *****"
+# running ORCA 
+if [[ $use_hw == "0" ]]; then
+	$orca_path/orca "$input_path" > "$(echo $output_dir)/$(echo $name).out"
+else
+	$orca_path/orca "$output_dir/$name.inp" --use-hwthread-cpus > "$(echo $output_dir)/$(echo $name).out"
+fi
+
+echo "***** ORCA CALCULATION DONE *****"
+echo "removing temporary files from output directory"
+rm "$(echo $output_dir)/*.tmp*"
+echo "***** END OF TASK *****"

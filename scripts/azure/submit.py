@@ -36,7 +36,7 @@ def add_tasks(batch_service_client, job_name: str, program: programs.Program, ta
 	# submits tasks
 	for input_file in os.listdir(local_target_dir):
 		name = os.path.split(input_file)[-1][:-4]
-		if input_file.endswith(".inp"):
+		if input_file.endswith(program.input_extension):
 			print("submitting {}".format(input_file))
 			command = program.run_command(azure_config.mount_dir + target_dir + input_file)
 			tasks.append(batch.models.TaskAddParameter(

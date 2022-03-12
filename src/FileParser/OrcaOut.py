@@ -24,8 +24,12 @@ class OrcaOut (FileParser):
         outdict = {
             "runtime": None,
             "final_energy": None,
-            "finished_normally": False
+            "finished_normally": False,
+            "n_electrons": None,
+            "homo_ev": None,
+            "lumo_ev": None
         }
+        MoEnergyBlock = False
         with open(self.path, "r", encoding="utf8") as f:
             for line in f.readlines():
                 if "FINAL SINGLE POINT ENERGY" in line:
@@ -36,6 +40,19 @@ class OrcaOut (FileParser):
                     outdict['runtime'] = float(line.split()[5])
                 if "****ORCA TERMINATED NORMALLY****" in line:
                     outdict["finished_normally"] = True
+                if "N(Total)" in line:
+                    outdict["n_electrons"] = int(np.floor(float(line.split()[-2])))
+                if  "NO   OCC          E(Eh)            E(eV)" in line:
+                    MoEnergyBlock = True
+                    continue
+                if MoEnergyBlock:
+                    occ = float(line.split()[1])
+                    energy = float(line.split()[-1])
+                    if occ == 1:
+                        outdict["homo_ev"] = energy
+                    else:
+                        outdict["lumo_ev"] = energy
+                        MoEnergyBlock = False
         return outdict
 
     def read_specie(self):
@@ -85,7 +102,7 @@ class OrcaOut (FileParser):
                     continue
                 if not spin is None:
                     opposite_spin_text = "SPIN UP" if spin.lower() == 'down' else "SPIN DOWN"
-                    spin_text = "SPIN" + spin.upper()
+                    spin_text = "SPIN " + spin.upper()
                     # stops parsing if read correct data (spin option is first)
                     if opposite_spin_text in line and not len(res) == 0:
                         break
@@ -116,7 +133,7 @@ class OrcaOut (FileParser):
                     continue
                 if "****************" in line:
                     LoewdinBlock = False
-            return res
+            return res.fillna(0)
 
     def write_file(self, specie, kwdict):
         return super().write_file(specie, kwdict)

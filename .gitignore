@@ -4,6 +4,9 @@ __pycache__/
 
 # ignore Azure configuration file
 azure_config.py
+# ignore SLURM configuration file & temp dir
+slurm_config.py
+scripts/slurm/tmp
 
 # ignore vscode settigns
 .vscode/

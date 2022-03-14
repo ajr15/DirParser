@@ -20,6 +20,10 @@ class OrcaOut (FileParser):
                         "runtime": (float) runtime in seconds,
                         "final_energy": (float) final energy in Hartree,
                         "finished_normally": (bool) wheather computation finished without errors
+                        "homo_ev": (float) the energy of the HOMO level in eV,
+                        "lumo_ev":(float) the energy of the LUMO level in eV,
+                        "has_imaginary_freq": (bool) if the molecule has imaginary frequencies (if no frequency calculation done, returns NONE)
+                        "gibbs_free_energy": (float) value of gibbs free energy of the molecule (if no frequency calculation done, returns NONE)
                     }"""
         outdict = {
             "runtime": None,
@@ -27,9 +31,13 @@ class OrcaOut (FileParser):
             "finished_normally": False,
             "n_electrons": None,
             "homo_ev": None,
-            "lumo_ev": None
+            "lumo_ev": None,
+            "has_imaginary_freq": None,
+            "gibbs_free_energy": None
         }
         MoEnergyBlock = False
+        FreqCalc = False
+        HasImFreq = False
         with open(self.path, "r", encoding="utf8") as f:
             for line in f.readlines():
                 if "FINAL SINGLE POINT ENERGY" in line:
@@ -53,6 +61,16 @@ class OrcaOut (FileParser):
                     else:
                         outdict["lumo_ev"] = energy
                         MoEnergyBlock = False
+                if "frequencies" in line.lower():
+                    FreqCalc = True
+                    continue
+                if FreqCalc and "***imaginary mode***" in line:
+                    outdict["has_imaginary_freq"] = True
+                if "Final Gibbs free energy" in line:
+                    outdict["gibbs_free_energy"] = float(line.split()[-2])
+            # after scanning the file, if frequency calc and not found imaginary freq => no imaginary freq in calc
+            if FreqCalc and outdict["has_imaginary_freq"] is None:
+                outdict["has_imaginary_freq"] = False
         return outdict
 
     def read_specie(self):

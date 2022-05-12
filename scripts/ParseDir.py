@@ -2,11 +2,11 @@ import argparse
 import os
 from importlib import import_module
 import sys; sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from DirParser.src.DirParser import DirParser
+from TorinaX.src.DirParser import DirParser
 
 def get_type_from_str(type_str):
     try:
-        pkg = import_module("DirParser.src.FileParser.{}".format(type_str, type_str))
+        pkg = import_module("TorinaX.src.FileParser.{}".format(type_str, type_str))
         return getattr(pkg, type_str)
     except ImportError:
         raise ValueError("Unrecognized file type")

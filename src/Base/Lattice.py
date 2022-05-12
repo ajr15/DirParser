@@ -1,16 +1,15 @@
+from typing import Optional
 import numpy as np
 
 
 class Lattice:
 
-    def __init__(self, vectors: np.array=np.array([])):
+    def __init__(self, vectors: Optional[np.array]=None):
         # checking if valid vector sizes inserted
-        if not len(vectors.size) == 2 or not vectors.size[0] == 3 or not vectors.size[1] == 3:
+        if not vectors.size == 2 or not vectors.size[0] == 3 or not vectors.size[1] == 3:
             raise ValueError("Invalid lattice vectors! must by a numpy array with size (3, 3)")
         else:
             self.vectors = vectors
-
-    
 
     @property
     def a(self):

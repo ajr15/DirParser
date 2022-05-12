@@ -11,7 +11,7 @@ class Structure (Specie):
         - lattice (Lattice): Lattice structure"""
 
     
-    def __init__(self, atoms: List[Atom]=[], lattice: Lattice=Lattice()):
+    def __init__(self, atoms: List[Atom], lattice: Lattice):
         self.lattice = lattice
         super().__init__(atoms)
 

@@ -10,3 +10,5 @@ scripts/slurm/tmp
 
 # ignore vscode settigns
 .vscode/
+# ignore pycharm settings
+.idea/

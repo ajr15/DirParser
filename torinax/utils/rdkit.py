@@ -1,4 +1,4 @@
-from ..FileParser.FileParser import FileParser
+from ..io.FileParser import FileParser
 from rdkit.Chem import rdchem, PeriodicTable
 from rdkit.rdgeom import Point3D
 

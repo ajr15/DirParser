@@ -1,6 +1,6 @@
 from .FileParser import FileParser
-from ..utils.obUtils import obmol_to_mol_dict, ob_read_file_to_mol_dict
-from ..Base.Molecule import Molecule
+from ..utils.openbabel import obmol_to_mol_dict, ob_read_file_to_mol_dict
+from ..base.Molecule import Molecule
 import openbabel as ob
 import subprocess
 import os

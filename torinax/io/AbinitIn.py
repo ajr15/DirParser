@@ -1,5 +1,5 @@
 from .FileParser import FileParser
-from ..Base.Structure import Structure
+from ..base.Structure import Structure
 from ..utils.utils import generate_unique_id
 from pymatgen.core.periodic_table import Element
 import warnings

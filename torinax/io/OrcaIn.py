@@ -1,5 +1,5 @@
 from .FileParser import FileParser
-from ..Base.Molecule import Molecule
+from ..base.Molecule import Molecule
 
 
 class OrcaIn (FileParser):

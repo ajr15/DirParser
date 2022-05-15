@@ -1,5 +1,5 @@
 from abc import ABC, abstractclassmethod
-from ..Base.Specie import Specie
+from ..base.Specie import Specie
 import os
 
 class FileParser (ABC):

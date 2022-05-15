@@ -60,7 +60,7 @@ if __name__ == "__main__":
     script = script.replace("$cpus_per_task$", str(nwokers))
     script = script.replace("$job_name$", str(job_name))
     script = script.replace("$args_file$", os.path.join(parent_dir, "scripts", "slurm", "tmp", "ars.txt"))
-    with open(os.path.join(parent_dir, "scripts", "slurm", "tmp", "slurm.src"), "w") as f:
+    with open(os.path.join(parent_dir, "scripts", "slurm", "tmp", "slurm.torinax"), "w") as f:
         f.write(script)
     # submitting
-    os.system("sbatch {}".format(os.path.join(parent_dir, "scripts", "slurm", "tmp", "slurm.src")))
+    os.system("sbatch {}".format(os.path.join(parent_dir, "scripts", "slurm", "tmp", "slurm.torinax")))

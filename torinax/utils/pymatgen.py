@@ -1,9 +1,9 @@
 from pymatgen.core import Structure as pmtStructure
 from pymatgen.core import Lattice as pmtLattice
 from pymatgen.core import PeriodicSite as pmtSite
-from ..Base.Structure import Structure
-from ..Base.Lattice import Lattice
-from ..Base.Atom import Atom
+from ..base.Structure import Structure
+from ..base.Lattice import Lattice
+from ..base.Atom import Atom
 
 
 def pmt_struct_to_structure(pmt_struct: pmtStructure):

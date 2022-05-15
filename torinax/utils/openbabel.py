@@ -1,7 +1,7 @@
 import openbabel as ob
-from ..Base.Molecule import Molecule
-from ..Base.Atom import Atom
-from ..Base.Bond import Bond
+from ..base.Molecule import Molecule
+from ..base.Atom import Atom
+from ..base.Bond import Bond
 
 def ob_read_file_to_molecule(filename):    
     """Method to use openbabel for reading molecule files into standard molecule dictionary (atom_symbols, atom_coords, bondmap)"""

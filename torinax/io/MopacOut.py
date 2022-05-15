@@ -1,7 +1,7 @@
 from .FileParser import FileParser
-from ..Base.Atom import Atom
-from ..Base.Molecule import Molecule
-from ..Base.Specie import Specie
+from ..base.Atom import Atom
+from ..base.Molecule import Molecule
+from ..base.Specie import Specie
 import re
 import numpy as np
 

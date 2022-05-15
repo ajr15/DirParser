@@ -15,9 +15,9 @@ from scripts.azure import programs
 
 def get_task_idx():
 	"""Makes a unique task id that is appended to its name. Used to allow tasks with the same name."""
-	with open(os.path.join(parent_dir, "src", "utils", ".jobcount"), "r") as f:
+	with open(os.path.join(parent_dir, "torinax", "utils", ".jobcount"), "r") as f:
 		idx = int(f.read())
-	with open(os.path.join(parent_dir, "src", "utils", ".jobcount"), "w") as f:
+	with open(os.path.join(parent_dir, "torinax", "utils", ".jobcount"), "w") as f:
 		f.write(str(idx + 1))
 	return idx
 

@@ -11,13 +11,13 @@ def pmt_struct_to_structure(pmt_struct: pmtStructure):
     lat = Lattice(pmt_struct.lattice.matrix)
     atoms = []
     for site in pmt_struct.sites:
-        atoms.append(Atom(site.species, site.coords))
+        atoms.append(Atom(site.specie, site.coords))
     return Structure(atoms, lat)
 
 
 def structure_to_pmt_structure(structure: Structure):
     """Method to convert internal Structure element to pymatgen Structure element"""
-    lat = pmtLattice(structure.lattice)
+    lat = pmtLattice(structure.lattice.vectors)
     sites = []
     for atom in structure.atoms:
         sites.append(pmtSite(

@@ -14,7 +14,7 @@ def obmol_to_molecule(obmol: ob.OBMol):
     for atom in ob.OBMolAtomIter(obmol):
         element = ob.OBElementTable().GetSymbol(atom.GetAtomicNum())
         coord = [atom.GetX(), atom.GetY(), atom.GetZ()]
-        atoms.append(Atom(element,coord))
+        atoms.append(Atom(element, coord))
     mol = Molecule(atoms)
     for bond in ob.OBMolBondIter(obmol):
         bond = Bond(bond.GetBeginAtomIdx() - 1, bond.GetEndAtomIdx() - 1, bond.GetBO())

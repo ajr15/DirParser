@@ -29,6 +29,8 @@ class OrcaIn (FileParser):
     def _check_kwdict(kwdict: dict) -> None:
         if not "input_text" in kwdict:
             raise ValueError("Must set input_text key with text to put above the coordinate section")
+        if not kwdict["input_text"].startswith("!"):
+            raise ValueError("Input text must start with !")
         if not "mult" in kwdict:
             raise ValueError("Must set mult key with multiplicity value of molecule")
         if not "charge" in kwdict:
@@ -46,6 +48,10 @@ class OrcaIn (FileParser):
     def write_file(self, specie: Molecule, kwdict: dict):
         """Method to write the file type, given keywords dictionary and a specie."""
         self._check_kwdict(kwdict)
+        if len(specie.atoms) == 1 and "OPT" in kwdict["input_text"]:
+            print("WARNING: input has optimization of one atom - this is not supported in ORCA 5")
+            print("Falling back to single point SCF")
+            kwdict["input_text"] = kwdict["input_text"].replace("OPT", "")
         with open(self.path, "w") as f:
             # writing input text
             f.write(kwdict["input_text"])

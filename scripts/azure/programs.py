@@ -22,5 +22,5 @@ class Orca (Program):
 	def run_command(self, input_file: str) -> str:
 		"""Method to make the command for running ORCA on the server"""
 		from azure_config import mount_dir
-		orca_run_script = mount_dir + "/.azure-batch/scripts/run_orca.torinax"
+		orca_run_script = mount_dir + "/.azure-batch/scripts/run_orca.src"
 		return "/bin/bash {} {} {}".format(orca_run_script, input_file, self.orca_parent, self.use_hw)

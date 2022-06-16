@@ -1,13 +1,24 @@
-from typing import Dict, List, Tuple
-from sqlalchemy import Column, Boolean, String
+from typing import Dict, List, Tuple, Optional
+from sqlalchemy import Column, String
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from abc import ABC, abstractclassmethod
 from torinax.clients import SlurmClient
 from dask.distributed import Client
+from time import time
 import dask as da
 from . import SqlBase
 
+
+def model_lookup_by_table_name(table_name: str):
+    registry_instance = getattr(SqlBase, "registry")
+    for mapper_ in registry_instance.mappers:
+        model = mapper_.class_
+        model_class_name = model.__tablename__
+        if model_class_name == table_name:
+            return model
+    # if no module found, raise an error
+    raise ValueError("Unknown table name {}. It does not exist in metadata.".format(table_name))
 
 def _comp_sql_model_creator(comp_name: str, results_attr: Dict[str, Column]):
     """Method to dynamically make SQLAlchemy models for each computation to store their results and status"""
@@ -16,20 +27,21 @@ def _comp_sql_model_creator(comp_name: str, results_attr: Dict[str, Column]):
         "id": Column(String(500), primary_key=True),
     }
     attr_dict.update(results_attr)
-    return type(comp_name, SqlBase, attr_dict)
+    return type(comp_name, (SqlBase, ), attr_dict)
 
 
 class Computation (ABC):
 
     """Abstract computation object"""
 
-    __name__ = "computation"
+    tablename = "computation"
+    name = "computation"
     __results_columns__ = {}
 
     def __init__(self):
         self.successful = False
-        if self.__name__:
-            self.sql_model = _comp_sql_model_creator(self.__name__, self.__results_columns__)
+        if self.tablename:
+            self.sql_model = _comp_sql_model_creator(self.tablename, self.__results_columns__)
 
     @abstractclassmethod
     def execute(self, db_session) -> List[SqlBase]:
@@ -62,14 +74,14 @@ class SlurmComputation (Computation):
 
     """Abstract computation to be executed in parallel on a SLURM cluster"""
 
-    __name__ = "slurm_computation"
+    tablename = "slurm_computation"
 
     def __init__(self, slurm_client: SlurmClient):
         self.client = slurm_client
         super().__init__()
 
     @abstractclassmethod
-    def make_cmd_list(self, db_session) -> Tuple(List[SqlBase], List[str]):
+    def make_cmd_list(self, db_session) -> Tuple[List[SqlBase], List[str]]:
         """Method to make list of command line strings for a single run in SLURM"""
         pass
 
@@ -84,7 +96,7 @@ class SlurmComputation (Computation):
 
 class DaskComputation (Computation):
 
-    __name__ = "dask_computation"
+    tablename = "dask_computation"
 
     def __init__(self, dask_client: Client):
         self.client = dask_client
@@ -98,7 +110,8 @@ class DaskComputation (Computation):
     def execute(self, db_session) -> List[SqlBase]:
         """Execute list of dask futures on a Dask cluster"""
         futures = self.make_futures(db_session)
-        return da.compute(futures, scheduler="distributed")
+        dicts = self.client.gather(futures)
+        return [self.sql_model(**d) for d in dicts]
 
 def run_computations(computations: List[Computation], db_path: Optional[str]=None, db_engine=None, db_session=None, verbose: int=1):
     """Method to execute multiple computations consecutively, and save results to a database file"""
@@ -116,7 +129,9 @@ def run_computations(computations: List[Computation], db_path: Optional[str]=Non
         session = db_session
     for comp in computations:
         if verbose > 0:
-            print("Running {}".format(comp.__name__))
+            print("Running {}".format(comp.name))
+        t1 = time()
         comp._execute(session)
+        t2 = time()
         if verbose > 0:
-            print("{} done".format(comp.__name__))
+            print("{} done in {} seconds".format(comp.name, round(t2 - t1, 3)))

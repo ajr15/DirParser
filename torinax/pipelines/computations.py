@@ -25,6 +25,7 @@ def _comp_sql_model_creator(comp_name: str, results_attr: Dict[str, Column]):
     attr_dict = {
         "__tablename__": comp_name,
         "id": Column(String(500), primary_key=True),
+        "__table_args__": {'extend_existing': True}
     }
     attr_dict.update(results_attr)
     return type(comp_name, (SqlBase, ), attr_dict)
@@ -98,7 +99,8 @@ class DaskComputation (Computation):
 
     tablename = "dask_computation"
 
-    def __init__(self, dask_client: Client):
+    def __init__(self, dask_client: Client, n_workers: int=1):
+        self.n_workers = n_workers
         self.client = dask_client
         super().__init__()
 
@@ -109,8 +111,10 @@ class DaskComputation (Computation):
 
     def execute(self, db_session) -> List[SqlBase]:
         """Execute list of dask futures on a Dask cluster"""
+        #self.client.cluster.scale(self.n_workers)
         futures = self.make_futures(db_session)
         dicts = self.client.gather(futures)
+        #self.client.cluster.scale(0)
         return [self.sql_model(**d) for d in dicts]
 
 def run_computations(computations: List[Computation], db_path: Optional[str]=None, db_engine=None, db_session=None, verbose: int=1):

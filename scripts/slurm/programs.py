@@ -22,7 +22,20 @@ class Orca (Program):
 	def run_command(self, input_file: str) -> str:
 		"""Method to make the command for running ORCA on the server"""
 		from .slurm_config import parent_dir
-		orca_run_script = "/home/shaharpit/Personal/DirParser/scripts/slurm/shell_scripts/run_orca.src"
+		orca_run_script = "/home/shaharpit/Personal/TorinaX/scripts/slurm/shell_scripts/run_orca.src"
 		comp_name = os.path.split(input_file)[-1].split(".")[0]
 		output_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(input_file))), comp_name + "_out", comp_name + ".out")
 		return "/bin/bash {} {} {} {} {}".format(orca_run_script, input_file, self.orca_parent, self.use_hw, output_file)
+
+class QuantumEspresso (Program):
+
+	input_extension = ".in"
+
+	def __init__(self, qe_path: str):
+		self.qe_path = qe_path
+
+	def run_command(self, input_file: str) -> str:
+		"""Method to make the command for running ORCA on the server"""
+		qe_run_script = "/home/shaharpit/Personal/TorinaX/scripts/slurm/shell_scripts/run_quantum_espresso.src"
+		outfile = os.path.abspath(input_file[:-2] + "out")
+		return "/bin/bash {} {} {} {}".format(qe_run_script, input_file, self.qe_path, outfile)

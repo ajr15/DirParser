@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from abc import ABC, abstractclassmethod
 from torinax.clients import SlurmClient
-from dask.distributed import Client
+#from dask.distributed import Client
 from time import time
 import dask as da
 from . import SqlBase
@@ -99,7 +99,7 @@ class DaskComputation (Computation):
 
     tablename = "dask_computation"
 
-    def __init__(self, dask_client: Client, n_workers: int=1):
+    def __init__(self, dask_client, n_workers: int=1):
         self.n_workers = n_workers
         self.client = dask_client
         super().__init__()
@@ -113,7 +113,7 @@ class DaskComputation (Computation):
         """Execute list of dask futures on a Dask cluster"""
         #self.client.cluster.scale(self.n_workers)
         futures = self.make_futures(db_session)
-        dicts = self.client.gather(futures)
+        dicts = da.compute(futures)[0]
         #self.client.cluster.scale(0)
         return [self.sql_model(**d) for d in dicts]
 

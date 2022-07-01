@@ -1,0 +1,26 @@
+#! /bin/bash
+filename=$1
+QE_EXE=$2
+outfile=$3
+
+module purge
+module load QE/6.4
+module load openmpi/1.10.7
+
+
+if [ ! -f "$filename" ]; then
+    echo "$filname doesn't exsits, exiting..."
+    exit 1
+fi
+
+mpirun $QE_EXE -input $filename > $outfile
+
+IFS='=' read -r -a prefix <<< $(grep prefix $filename)
+prefix=$(echo ${prefix[1]} | tr -d "," | tr -d "\'")
+IFS='=' read -r -a tmp_dir <<< $(grep outdir $filename)
+tmp_dir=$(echo ${tmp_dir[1]} | tr -d "," | tr -d "\'")
+echo "Removing $prefix from $tmp_dir"
+
+for file in $tmp_dir/$prefix*; do
+    rm -r $file
+done

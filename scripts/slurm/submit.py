@@ -14,6 +14,7 @@ slurm_script = \
 #SBATCH -N 1
 #SBATCH -J $job_name$
 #SBATCH --output=/dev/null
+#SBATCH --error=./errors.txt
 
 args_file=$args_file$
 # get the i-th line of the param file

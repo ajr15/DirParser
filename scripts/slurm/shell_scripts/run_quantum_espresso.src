@@ -6,7 +6,8 @@ outfile=$3
 module purge
 module load gnu/9.1.0
 module load mkl/18.0.1.163
-module load openmpi/4.0.4_gnu
+module load spack_0.16.0
+module load openmpi/4.0.4
 
 
 if [ ! -f "$filename" ]; then
@@ -14,7 +15,7 @@ if [ ! -f "$filename" ]; then
     exit 1
 fi
 
-mpirun $QE_EXE -input $filename > $outfile
+mpirun -n 8 $QE_EXE -input $filename > $outfile
 
 IFS='=' read -r -a prefix <<< $(grep prefix $filename)
 prefix=$(echo ${prefix[1]} | tr -d "," | tr -d "\'")

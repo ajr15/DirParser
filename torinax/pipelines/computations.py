@@ -20,7 +20,7 @@ def model_lookup_by_table_name(table_name: str):
     # if no module found, raise an error
     raise ValueError("Unknown table name {}. It does not exist in metadata.".format(table_name))
 
-def _comp_sql_model_creator(comp_name: str, results_attr: Dict[str, Column]):
+def comp_sql_model_creator(comp_name: str, results_attr: Dict[str, Column]):
     """Method to dynamically make SQLAlchemy models for each computation to store their results and status"""
     attr_dict = {
         "__tablename__": comp_name,
@@ -42,7 +42,7 @@ class Computation (ABC):
     def __init__(self):
         self.successful = False
         if self.tablename:
-            self.sql_model = _comp_sql_model_creator(self.tablename, self.__results_columns__)
+            self.sql_model = comp_sql_model_creator(self.tablename, self.__results_columns__)
 
     @abstractclassmethod
     def execute(self, db_session) -> List[SqlBase]:
@@ -77,8 +77,9 @@ class SlurmComputation (Computation):
 
     tablename = "slurm_computation"
 
-    def __init__(self, slurm_client: SlurmClient):
+    def __init__(self, slurm_client: SlurmClient, job_limit=5000):
         self.client = slurm_client
+        self.job_limit = job_limit
         super().__init__()
 
     @abstractclassmethod
@@ -89,6 +90,8 @@ class SlurmComputation (Computation):
     def execute(self, db_session) -> List[SqlBase]:
         """Execute list of command-line arguments on a SLURM cluster"""
         entries, cmds = self.make_cmd_list(db_session)
+        if len(cmds) > self.job_limit:
+            raise RuntimeError("Too many jobs are requested {} (max allowed {})".format(len(cmds), self.job_limit))
         # submit to client
         self.client.submit(cmds)
         # wating for task completion

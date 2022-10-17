@@ -59,7 +59,7 @@ class LammpsIn (FileParser):
             # writing atom type masses
             f.write("Masses\n\n")
             for k, v in atom_type_dict.items():
-                f.write("{} {}\n".format(v + 1, Element(k).atomic_mass))
+                f.write("{} {}\n".format(v + 1, Element(k).atomic_mass.real))
             # madatory empty line
             f.write("\n")
             # writing the structure
@@ -88,6 +88,6 @@ class LammpsIn (FileParser):
             #vector_sizes = list(struct.lattice.vectors[0]) + list(struct.lattice.vectors[1]) + list(struct.lattice.vectors[2])
             #f.write("""lattice custom 1 a1 {} {} {} a2 {} {} {} a3 {} {} {} basis 0.0 0.0 0.0\n""".format(*vector_sizes))
             # reading structure from file
-            f.write("read_data {}\n".format(os.path.abspath(data_file_path)))
+            f.write("read_data \"{}\"\n".format(os.path.abspath(data_file_path)))
             # writing rest of the input file
             f.write(kwdict["input_string"])

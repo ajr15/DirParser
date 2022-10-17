@@ -11,7 +11,7 @@ def pmt_struct_to_structure(pmt_struct: pmtStructure):
     lat = Lattice(pmt_struct.lattice.matrix)
     atoms = []
     for site in pmt_struct.sites:
-        atoms.append(Atom(site.specie, site.coords))
+        atoms.append(Atom(site.specie.symbol, site.coords))
     return Structure(atoms, lat)
 
 

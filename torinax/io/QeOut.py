@@ -72,6 +72,7 @@ class QeOut (FileParser):
             for atom in atoms:
                 atom.coordinates = np.matmul(mat, np.transpose(atom.coordinates))
             lat = Lattice(cell_vectors)
+            print(atoms)
             return Structure(atoms, lat)
 
 

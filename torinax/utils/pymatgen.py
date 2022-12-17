@@ -3,6 +3,7 @@ from pymatgen.core import Lattice as pmtLattice
 from pymatgen.core import PeriodicSite as pmtSite
 from ..base.Lattice import Lattice
 from ..base.Atom import Atom
+from ..base.Structure import Structure
 
 
 def pmt_struct_to_structure(pmt_struct: pmtStructure):

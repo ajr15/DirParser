@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from .Specie import Specie
 from .Atom import Atom
 from .Lattice import Lattice
-from ..utils.pymatgen import structure_to_pmt_structure
 from typing import List
 
 class Structure (Specie):
@@ -18,6 +17,7 @@ class Structure (Specie):
 
     
     def save_to_file(self, path: str):
+        from ..utils.pymatgen import structure_to_pmt_structure
         if not path.endswith(".cif"):
             raise ValueError("Structure saving format is only cif. not {}".format(path.split(".")[-1]))
         pmtstruct = structure_to_pmt_structure(self)

@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     # pring job help if required
     if args.list_jobs:
-        for k, v in azure_config.job_dict.items():
+        for k, v in slurm_config.job_dict.items():
             print(k, v["help_msg"])
             import sys; sys.exit()
 

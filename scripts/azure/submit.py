@@ -32,13 +32,14 @@ def add_tasks(batch_service_client, job_name: str, program: programs.Program, ta
 		target_dir (str): target directory (contains all input files to run)
 	"""
 	tasks = list()
-	local_target_dir = os.path.join(azure_config.local_mount_dir, target_dir.replace('/', '\\'))
+	local_target_dir = os.path.join(azure_config.LOCAL_FILE_SHARE_MOUNT, target_dir)
+	print("Submitting files from", local_target_dir)
 	# submits tasks
 	for input_file in os.listdir(local_target_dir):
 		name = os.path.split(input_file)[-1][:-4]
 		if input_file.endswith(program.input_extension):
 			print("submitting {}".format(input_file))
-			command = program.run_command(azure_config.mount_dir + target_dir + input_file)
+			command = program.run_command(os.path.join(azure_config.NODE_FILE_SHARE_MOUNT, target_dir, input_file))
 			tasks.append(batch.models.TaskAddParameter(
 				id="{}_{}".format(get_task_idx(), name),
 				command_line=command
@@ -49,12 +50,8 @@ def add_tasks(batch_service_client, job_name: str, program: programs.Program, ta
 
 def format_target_dir(target_dir) -> str:
 	"""Method to format the supplied target directory to the desired format"""
-	# validation
-	if "\\" in target_dir:
-		raise ValueError("Supplied target directory must contain only / as separator (unix style path)")
-	# formatting
-	if not target_dir.startswith("/"):
-		target_dir = "/" + target_dir
+	if target_dir.startswith("/"):
+		target_dir = target_dir[1:]
 	if not target_dir.endswith("/"):
 		target_dir = target_dir + "/"
 	return target_dir
@@ -72,14 +69,14 @@ if __name__ == '__main__':
 	
 	# pring job help if required
 	if args.list_jobs:
-		for k, v in azure_config.job_dict.items():
+		for k, v in azure_config.JOB_DICT.items():
 			print(k, v["help_msg"])
 		import sys; sys.exit()
 	
 	# validate & formatting input parameters
 	target_dir = format_target_dir(target_dir)
-	if not job_id.lower() in azure_config.job_dict:
-		raise ValueError("Unrecognized job name {}, available job names {}".format(job_id, ", ".join(azure_config.job_dict.keys())))
+	if not job_id.lower() in azure_config.JOB_DICT:
+		raise ValueError("Unrecognized job name {}, available job names {}".format(job_id, ", ".join(azure_config.JOB_DICT.keys())))
 
 	# setup azure credentials
 	credentials = batch_auth.SharedKeyCredentials(azure_config._BATCH_ACCOUNT_NAME,
@@ -90,7 +87,7 @@ if __name__ == '__main__':
 		batch_url=azure_config._BATCH_ACCOUNT_URL)
 	# add tasks
 	print("Adding tasks...")
-	add_tasks(batch_client, job_id, azure_config.job_dict[job_id]["program"], target_dir)
+	add_tasks(batch_client, job_id, azure_config.JOB_DICT[job_id]["program"], target_dir)
 	# finished
 	print("Finished submission !")
 	

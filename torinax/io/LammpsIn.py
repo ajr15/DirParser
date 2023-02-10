@@ -84,10 +84,6 @@ class LammpsIn (FileParser):
             for k, v in default_top_kwargs.items():
                 f.write("{} {}\n".format(k, v))
             f.write("box tilt large\n")
-            # writing lattice 
-            #vector_sizes = list(struct.lattice.vectors[0]) + list(struct.lattice.vectors[1]) + list(struct.lattice.vectors[2])
-            #f.write("""lattice custom 1 a1 {} {} {} a2 {} {} {} a3 {} {} {} basis 0.0 0.0 0.0\n""".format(*vector_sizes))
-            # reading structure from file
             f.write("read_data \"{}\"\n".format(os.path.abspath(data_file_path)))
             # writing rest of the input file
             f.write(kwdict["input_string"])

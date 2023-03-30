@@ -11,6 +11,9 @@ _slurm_script = \
 #SBATCH -J $job_name$
 #SBATCH --output=/dev/null
 
+# #SBATCH --output=%a.out
+# #SBATCH --error=%a.out
+
 args_file=$args_file$
 # get the i-th line of the param file
 run_command=$(sed -n "$SLURM_ARRAY_TASK_ID"p "$args_file")

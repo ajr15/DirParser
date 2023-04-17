@@ -33,3 +33,11 @@ def molecule_to_obmol(molecule: Molecule):
     for bond in molecule.bonds:
         obmol.AddBond(bond.first_atom_idx + 1, bond.second_atom_idx + 1, bond.bond_order)
     return obmol
+
+def atomic_numer_to_symbol(Z: int):
+    """Method to convert atomic number to symbol using OpenBabel"""
+    return ob.OBElementTable().GetSymbol(Z)
+
+def atomic_symbol_to_number(symbol: str):
+    """Method to convert atomic symbol to number using OpenBabel"""
+    return ob.OBElementTable().GetAtomicNumber(symbol)

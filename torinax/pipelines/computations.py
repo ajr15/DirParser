@@ -24,7 +24,7 @@ def comp_sql_model_creator(comp_name: str, results_attr: Dict[str, Column]):
     """Method to dynamically make SQLAlchemy models for each computation to store their results and status"""
     attr_dict = {
         "__tablename__": comp_name,
-        "id": Column(String(500), primary_key=True),
+        # "id": Column(String, primary_key=True),
         "__table_args__": {'extend_existing': True}
     }
     attr_dict.update(results_attr)

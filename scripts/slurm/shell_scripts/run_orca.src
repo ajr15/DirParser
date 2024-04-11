@@ -1,7 +1,7 @@
 #!/bin/bash
 # parsing command line arguments
 # COMMAND LINE ARGUMENTS
-# 1. (required, str) input_path: full path to input file for run
+# 	1. (required, str) input_path: full path to input file for run
 #	2. (required, str) orca_parent: full path to the ORCA directory
 #	3. (required, int) use_hwthreading: 0 or 1 designating use of hyperthreading in the machine
 input_path=$1

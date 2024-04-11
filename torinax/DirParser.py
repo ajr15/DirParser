@@ -22,14 +22,15 @@ class DirParser:
         """Method to read all files in the directory"""
         if not os.path.isdir(path):
             raise ValueError("{} is not a directory. Must provide a dicrectory".format(path))
-        self.df = pd.DataFrame()
+        data = []
         for dir, subdirs, fnames in os.walk(path):
             for fname in fnames:
                 if fname.endswith(self.file_parser.extension):
                     f = self.file_parser(os.path.join(dir, fname))
                     d = f.read_scalar_data(*args, **kwargs)
                     d.update({"dir": dir, "name": os.path.splitext(fname)[0]})
-                    self.df = self.df.append(d, ignore_index=True)
+                    data.append(d)
+        self.df = pd.DataFrame(data=data)
         return self.df
 
     def save_species(self, path, ext, *args, **kwargs):
